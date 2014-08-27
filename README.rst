@@ -7,7 +7,7 @@ Installation
 
 .. code-block:: bash
 
-    $ pip install google_scholar_scraper
+    $ pip install google-scholar-scraper
 
 
 Command-line usage
