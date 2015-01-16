@@ -2,6 +2,8 @@
 google-scholar-scraper
 **********************
 
+Version 0.2 works with Python3.
+
 Installation
 ============
 

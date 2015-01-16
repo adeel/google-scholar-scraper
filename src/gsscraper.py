@@ -5,7 +5,7 @@ Scrape Google Scholar search results for references.
 import re
 import hashlib
 import random
-import htmlentitydefs
+import html.entities as htmlent
 import optparse
 import requests
 import bibtexparser
@@ -22,26 +22,26 @@ def _unescape_html_entities(html):
       # character reference
       try:
         if html[:3] == "&#x":
-          return unichr(int(html[3:-1], 16))
+          return chr(int(html[3:-1], 16))
         else:
-          return unichr(int(html[2:-1]))
+          return chr(int(html[2:-1]))
       except ValueError:
         pass
     else:
-      # named entity
+      # named entity9
       try:
-        html = unichr(htmlentitydefs.name2codepoint[html[1:-1]])
+        html = chr(htmlent.name2codepoint[html[1:-1]])
       except KeyError:
         pass
     return html # leave as is
   return re.sub("&#?\w+;", fixup, html)
 
 def _gen_fake_google_id():
-  return hashlib.md5(str(random.random())).hexdigest()[:16]
+  return hashlib.md5(str(random.random()).encode("utf-8")).hexdigest()[:16]
 
 def _extract_bib_links(html):
-  return map(_unescape_html_entities,
-  re.compile(r'<a href="(/scholar\.bib\?[^"]*)').findall(html))
+  return [_unescape_html_entities(m) for m in \
+            re.compile(r'<a href="(/scholar\.bib\?[^"]*)').findall(html)]
 
 def _do_gscholar_request(path, gid, params={}):
   return requests.get(GSCHOLAR_BASE_URL + path, params=params,
@@ -53,8 +53,7 @@ def _extract_bib_from_link(link, gid):
 
 def _extract_bibtex_results(html, count, gid):
   links = _extract_bib_links(html)[:count]
-  return map(lambda link: _extract_bib_from_link(link, gid),
-  links)
+  return [_extract_bib_from_link(link, gid) for link in links]
 
 def _parse_bibtex(bib):
   return bibtexparser.loads(bib).entries
@@ -76,7 +75,7 @@ def _render_ref_as_xml(r):
     "".join(["\n  <%s>%s</%s>" % (k, v, k) for (k, v) in r.items()]))
 
 def get_results_as_xml(query, count):
-  return map(_render_ref_as_xml, get_results(query, count))
+  return [_render_ref_as_xml(r) for r in get_results(query, count)]
 
 def get_result_as_xml(query):
   rs = get_results_as_xml(query, 1)
@@ -94,4 +93,4 @@ def main():
   query = args[0]
   results = get_results_as_xml(query, options.count)
   out = "\n\n".join(results)
-  print(out.encode("utf8", "ignore"))
+  print(out)

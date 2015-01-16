@@ -10,7 +10,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
   long_description = f.read()
 
 setup(name='google-scholar-scraper',
-      version='0.1',
+      version='0.2',
       description='Python library for scraping Google Scholar.',
       long_description=long_description,
       author='Adeel Khan',
