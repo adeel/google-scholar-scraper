@@ -94,4 +94,4 @@ def main():
   query = args[0]
   results = get_results_as_xml(query, options.count)
   out = "\n\n".join(results)
-  print out.encode("utf8", "ignore")
+  print(out.encode("utf8", "ignore"))
